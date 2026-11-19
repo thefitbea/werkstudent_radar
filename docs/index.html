@@ -9,7 +9,50 @@
       --bg: #0f172a; --card: #1e293b; --border: #334155;
       --text: #f1f5f9; --muted: #94a3b8; --accent: #38bdf8;
       --green: #22c55e; --amber: #f59e0b; --red: #ef4444;
+      --star: #facc15;
     }
+
+
+
+
+
+
+
+    
+    
+    .job-card.starred {
+  border-color: rgba(250, 204, 21, 0.55);
+}
+
+.star-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 2px 6px;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.star-btn:hover {
+  color: var(--star);
+  border-color: var(--border);
+}
+
+.star-btn.active {
+  color: var(--star);
+}
+
+
+
+
+
+
+
+
+
+
+    
     * { box-sizing: border-box; }
     body {
       margin: 0; font-family: system-ui, -apple-system, sans-serif;
