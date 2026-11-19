@@ -1,1 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Industry 4.0 Student Job Radar</title>
+  <style>
+    :root {
+      --bg: #0f172a; --card: #1e293b; --border: #334155;
+      --text: #f1f5f9; --muted: #94a3b8; --accent: #38bdf8;
+      --green: #22c55e; --amber: #f59e0b; --red: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.45;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 16px; }
+    h1 { font-size: 1.35rem; margin: 0; }
+    .meta { color: var(--muted); font-size: 0.85rem; }
+    .panel {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px; margin-bottom: 16px;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+    label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+    input[type="text"], select {
+      width: 100%; padding: 8px 10px; border-radius: 6px;
+      border: 1px solid var(--border); background: #0b1220; color: var(--text); font-size: 0.9rem;
+    }
+    .toggles { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; font-size: 0.88rem; }
+    .toggles label { display: flex; align-items: center; gap: 6px; color: var(--text); margin: 0; cursor: pointer; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .chip {
+      padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border);
+      background: #0b1220; color: var(--muted); font-size: 0.78rem; cursor: pointer;
+    }
+    .chip.active { background: var(--accent); color: #0f172a; border-color: var(--accent); font-weight: 600; }
+    .stats { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .tabs { display: flex; gap: 8px; }
+    button {
+      padding: 7px 12px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--card); color: var(--text); cursor: pointer; font-size: 0.85rem;
+    }
+    button.active { background: var(--accent); color: #0f172a; border-color: var(--accent); font-weight: 600; }
+    .job-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .job-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .job-title { font-weight: 700; font-size: 1rem; color: var(--accent); text-decoration: none; }
+    .job-title:hover { text-decoration: underline; }
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 600; background: #0b1220; border: 1px solid var(--border);
+    }
+    .score { background: rgba(34,197,94,0.18); color: var(--green); border-color: rgba(34,197,94,0.4); }
+    .warn { background: rgba(245,158,11,0.18); color: var(--amber); border-color: rgba(245,158,11,0.4); }
+    .rej { background: rgba(239,68,68,0.18); color: var(--red); border-color: rgba(239,68,68,0.4); }
+    .applied-tag { background: rgba(56,189,248,0.2); color: var(--accent); border-color: var(--accent); }
+    .row-meta { font-size: 0.84rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .snippet { font-size: 0.84rem; color: #cbd5e1; }
+    .actions { display: flex; gap: 8px; margin-top: 4px; }
+    .actions button { padding: 4px 10px; font-size: 0.78rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Industry 4.0 Student Job Radar</h1>
+      <div class="meta" id="updatedAt">Loading jobs.json...</div>
+    </header>
 
+    <section class="panel">
+      <div class="grid">
+        <div>
+          <label for="search">Search (company, title, city, keyword)</label>
+          <input id="search" type="text" placeholder="e.g. Berlin, SAP, Python..." />
+        </div>
+        <div>
+          <label for="region">Region</label>
+          <select id="region">
+            <option value="ALL" selected>All Regions</option>
+            <option value="Berlin/Potsdam">Berlin / Potsdam</option>
+            <option value="Remote DE">Remote Germany</option>
+            <option value="Bavaria">Bavaria</option>
+          </select>
+        </div>
+        <div>
+          <label for="contract">Contract Type</label>
+          <select id="contract">
+            <option value="ALL">Werkstudent + Praktikum</option>
+            <option value="Werkstudent">Werkstudent Only</option>
+            <option value="Praktikum / Intern">Praktikum / Intern Only</option>
+          </select>
+        </div>
+        <div>
+          <label for="minScore">Min Score (<span id="scoreVal">3</span>)</label>
+          <input id="minScore" type="range" min="0" max="15" value="3" style="width:100%; margin-top:8px;" />
+        </div>
+        <div>
+          <label for="extraExclude">Extra Exclude (comma-separated)</label>
+          <input id="extraExclude" type="text" placeholder="e.g. sales, marketing, cad" />
+        </div>
+      </div>
+
+      <div class="toggles">
+        <label><input type="checkbox" id="rejectC1" checked /> Auto-reject C1 / Native German</label>
+        <label><input type="checkbox" id="hidePflicht" checked /> Hide Mandatory Internship (Pflichtpraktikum)</label>
+        <label><input type="checkbox" id="hideCar" checked /> Hide Car / License Required</label>
+        <label><input type="checkbox" id="enOnly" /> Must Mention English</label>
+        <label><input type="checkbox" id="hideDismissed" checked /> Hide Ignored Jobs</label>
+      </div>
+
+      <div class="chips" id="skillChips"></div>
+    </section>
+
+    <div class="stats">
+      <div class="tabs">
+        <button id="tabQualified" class="active">Qualified (0)</button>
+        <button id="tabRejected">Filtered Out Audit (0)</button>
+      </div>
+      <div>
+        <button id="exportCsv">Export Filtered CSV</button>
+      </div>
+    </div>
+
+    <main id="list"></main>
+  </div>
+
+  <script>
+    const SKILL_FILTERS = ["python", "sql", "sap", "power bi", "supply chain", "logistics", "logistik", "erp", "iiot", "data", "automation"];
+    let allJobs = [];
+    let activeTab = "qualified";
+    let requiredSkills = new Set();
+    let appliedIds = new Set(JSON.parse(localStorage.getItem("appliedIds") || "[]"));
+    let hiddenIds = new Set(JSON.parse(localStorage.getItem("hiddenIds") || "[]"));
+    let lastQualified = [];
+
+    const els = {
+      search: document.getElementById("search"),
+      region: document.getElementById("region"),
+      contract: document.getElementById("contract"),
+      minScore: document.getElementById("minScore"),
+      scoreVal: document.getElementById("scoreVal"),
+      extraExclude: document.getElementById("extraExclude"),
+      rejectC1: document.getElementById("rejectC1"),
+      hidePflicht: document.getElementById("hidePflicht"),
+      hideCar: document.getElementById("hideCar"),
+      enOnly: document.getElementById("enOnly"),
+      hideDismissed: document.getElementById("hideDismissed"),
+      chips: document.getElementById("skillChips"),
+      tabQualified: document.getElementById("tabQualified"),
+      tabRejected: document.getElementById("tabRejected"),
+      list: document.getElementById("list"),
+      updatedAt: document.getElementById("updatedAt"),
+      exportCsv: document.getElementById("exportCsv"),
+    };
+
+    SKILL_FILTERS.forEach(skill => {
+      const btn = document.createElement("span");
+      btn.className = "chip";
+      btn.textContent = `+ ${skill}`;
+      btn.onclick = () => {
+        if (requiredSkills.has(skill)) { requiredSkills.delete(skill); btn.classList.remove("active"); }
+        else { requiredSkills.add(skill); btn.classList.add("active"); }
+        render();
+      };
+      els.chips.appendChild(btn);
+    });
+
+    function saveState() {
+      localStorage.setItem("appliedIds", JSON.stringify([...appliedIds]));
+      localStorage.setItem("hiddenIds", JSON.stringify([...hiddenIds]));
+    }
+
+    function escapeHtml(str) {
+      return (str || "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+    }
+
+    function evaluate() {
+      const q = els.search.value.trim().toLowerCase();
+      const region = els.region.value;
+      const contract = els.contract.value;
+      const minScore = Number(els.minScore.value);
+      const extraEx = els.extraExclude.value.split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+
+      const qualified = [], rejected = [];
+
+      for (const j of allJobs) {
+        const hay = `${j.company} ${j.title} ${j.location} ${j.snippet} ${(j.skills || []).join(" ")}`.toLowerCase();
+        let reason = "";
+
+        if (els.hideDismissed.checked && hiddenIds.has(j.id)) reason = "Hidden by you";
+        else if (j.blacklist_hit) reason = `Blacklisted title: ${j.blacklist_hit}`;
+        else if (region !== "ALL" && j.region !== region) reason = `Region (${j.region})`;
+        else if (contract !== "ALL" && j.contract !== contract) reason = `Contract (${j.contract})`;
+        else if (els.hidePflicht.checked && j.is_pflicht) reason = "Mandatory internship (Pflichtpraktikum)";
+        else if (els.rejectC1.checked && j.requires_c1) reason = "Requires C1 / Native German";
+        else if (els.hideCar.checked && j.requires_car) reason = "Requires car / driver's license";
+        else if (els.enOnly.checked && !j.mentions_en) reason = "English not mentioned";
+        else if (extraEx.some(w => hay.includes(w))) reason = "Matched extra exclude keyword";
+        else if ([...requiredSkills].some(s => !(j.skills || []).includes(s) && !hay.includes(s))) reason = "Missing selected required skill";
+        else if (q && !hay.includes(q)) reason = "Search mismatch";
+        else if (j.score < minScore) reason = `Score ${j.score} < ${minScore}`;
+
+        if (reason) rejected.push({ ...j, reason });
+        else qualified.push(j);
+      }
+      return { qualified, rejected };
+    }
+
+    function render() {
+      els.scoreVal.textContent = els.minScore.value;
+      const { qualified, rejected } = evaluate();
+      lastQualified = qualified;
+
+      els.tabQualified.textContent = `Qualified (${qualified.length})`;
+      els.tabRejected.textContent = `Filtered Out Audit (${rejected.length})`;
+
+      const rows = activeTab === "qualified" ? qualified : rejected;
+      if (!rows.length) {
+        els.list.innerHTML = `<div class="panel">No jobs match the current filters. Try lowering Min Score or switching Region to All.</div>`;
+        return;
+      }
+
+      els.list.innerHTML = rows.map(j => {
+        const isApplied = appliedIds.has(j.id);
+        const isHidden = hiddenIds.has(j.id);
+        const flags = [];
+        if (j.is_pflicht) flags.push(`<span class="badge warn">Pflichtpraktikum</span>`);
+        if (j.requires_car) flags.push(`<span class="badge warn">Car/License</span>`);
+        if (j.requires_c1) flags.push(`<span class="badge rej">C1 German</span>`);
+        if (isApplied) flags.push(`<span class="badge applied-tag">APPLIED</span>`);
+        if (j.reason) flags.push(`<span class="badge rej">${escapeHtml(j.reason)}</span>`);
+
+        return `
+          <article class="job-card">
+            <div class="job-top">
+              <div>
+                <a class="job-title" href="${escapeHtml(j.url)}" target="_blank" rel="noopener">${escapeHtml(j.title)}</a>
+                <div class="row-meta">
+                  <strong>${escapeHtml(j.company)}</strong>
+                  <span>• ${escapeHtml(j.location)} (${escapeHtml(j.region)})</span>
+                  <span>• ${escapeHtml(j.contract)}</span>
+                  <span>• ${escapeHtml(j.source)}</span>
+                </div>
+              </div>
+              <span class="badge score">Score ${j.score}</span>
+            </div>
+            <div class="row-meta">
+              ${(j.skills || []).map(s => `<span class="badge">${escapeHtml(s)}</span>`).join("")}
+              ${flags.join("")}
+            </div>
+            ${j.snippet ? `<div class="snippet">${escapeHtml(j.snippet)}...</div>` : ""}
+            <div class="actions">
+              <button data-action="apply" data-id="${escapeHtml(j.id)}">${isApplied ? "Unmark Applied" : "Mark Applied"}</button>
+              <button data-action="hide" data-id="${escapeHtml(j.id)}">${isHidden ? "Unhide" : "Hide"}</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    els.list.addEventListener("click", e => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      const id = btn.dataset.id;
+      if (btn.dataset.action === "apply") {
+        appliedIds.has(id) ? appliedIds.delete(id) : appliedIds.add(id);
+      } else if (btn.dataset.action === "hide") {
+        hiddenIds.has(id) ? hiddenIds.delete(id) : hiddenIds.add(id);
+      }
+      saveState();
+      render();
+    });
+
+    els.tabQualified.onclick = () => { activeTab = "qualified"; els.tabQualified.classList.add("active"); els.tabRejected.classList.remove("active"); render(); };
+    els.tabRejected.onclick = () => { activeTab = "rejected"; els.tabRejected.classList.add("active"); els.tabQualified.classList.remove("active"); render(); };
+
+    els.exportCsv.onclick = () => {
+      const headers = ["score", "company", "title", "contract", "location", "region", "skills", "source", "url"];
+      const lines = [headers.join(",")].concat(
+        lastQualified.map(j => headers.map(h => `"${String(Array.isArray(j[h]) ? j[h].join(";") : (j[h] ?? "")).replace(/"/g, '""')}"`).join(","))
+      );
+      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "filtered_jobs.csv";
+      a.click();
+    };
+
+    Object.values(els).forEach(el => {
+      if (el && ["INPUT", "SELECT"].includes(el.tagName)) el.addEventListener("input", render);
+    });
+
+    fetch(`./jobs.json?t=${Date.now()}`)
+      .then(r => { if (!r.ok) throw new Error("jobs.json not found yet — run the GitHub Action once."); return r.json(); })
+      .then(data => {
+        allJobs = data.jobs || [];
+        els.updatedAt.textContent = `Last scan: ${data.updated_at} • ${allJobs.length} student postings indexed`;
+        render();
+      })
+      .catch(err => {
+        els.updatedAt.textContent = "Waiting for first scan";
+        els.list.innerHTML = `<div class="panel">${escapeHtml(err.message)}</div>`;
+      });
+  </script>
+</body>
+</html>
