@@ -3,30 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Job Radar</title>
+  <title>Industry 4.0 Student Job Radar</title>
   <style>
-
-    listEl.addEventListener("click", (event) => {
-  const btn = event.target.closest("button[data-action]");
-  if (!btn) return;
-
-  const { action, id } = btn.dataset;
-  if (action === "star") {
-    toggleFavorite(id);
-    render();
-  }
-});
-    
     :root {
-  --bg: #faf9f6;          /* Warm off-white page background */
-  --card: #ffffff;        /* Crisp white job cards */
-  --border: #e5e0d5;      /* Subtle warm border */
-  --text: #111827;        /* Near-black high-contrast text */
-  --muted: #57534e;       /* Muted charcoal for secondary labels */
-  --gold: #a16207;        /* Dark gold readable on light backgrounds */
-  --gold-bright: #eab308; /* Bright gold for stars and active borders */
-  --gold-soft: #fef9c3;   /* Soft tint for active chips/badges */
-}
+      --bg: #0f172a; --card: #1e293b; --border: #334155;
+      --text: #f1f5f9; --muted: #94a3b8; --accent: #38bdf8;
+      --green: #22c55e; --amber: #f59e0b; --red: #ef4444;
+    }
     * { box-sizing: border-box; }
     body {
       margin: 0; font-family: system-ui, -apple-system, sans-serif;
