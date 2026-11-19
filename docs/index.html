@@ -5,6 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Job Radar</title>
   <style>
+
+    listEl.addEventListener("click", (event) => {
+  const btn = event.target.closest("button[data-action]");
+  if (!btn) return;
+
+  const { action, id } = btn.dataset;
+  if (action === "star") {
+    toggleFavorite(id);
+    render();
+  }
+});
+    
     :root {
   --bg: #faf9f6;          /* Warm off-white page background */
   --card: #ffffff;        /* Crisp white job cards */
