@@ -20,6 +20,25 @@
   data-id="${escapeHtml(j.id)}"
   title="${isStarred ? "Starred" : "Star job"}"
 >${isStarred ? "★" : "☆"}</button>
+   let starredIds = new Set(JSON.parse(localStorage.getItem("starredIds") || "[]"));
+
+function saveStarred() {
+  localStorage.setItem("starredIds", JSON.stringify([...starredIds]));
+}
+
+function sortByStarAndScore(list) {
+  list.sort((a, b) => {
+    const starDiff = Number(starredIds.has(b.id)) - Number(starredIds.has(a.id));
+    return starDiff !== 0 ? starDiff : b.score - a.score;
+  });
+}
+
+// Inside your #list click delegation handler:
+if (act === "star") {
+  starredIds.has(id) ? starredIds.delete(id) : starredIds.add(id);
+  saveStarred();
+  render();
+}
 
 
 
