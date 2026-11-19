@@ -14,12 +14,6 @@
 
 <button id="tabStarred">Starred (0)</button>
 
-<button
-  class="star-btn ${isStarred ? "active" : ""}"
-  data-action="star"
-  data-id="${escapeHtml(j.id)}"
-  title="${isStarred ? "Starred" : "Star job"}"
->${isStarred ? "★" : "☆"}</button>
    let starredIds = new Set(JSON.parse(localStorage.getItem("starredIds") || "[]"));
 
 function saveStarred() {
