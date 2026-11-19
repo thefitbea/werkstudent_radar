@@ -15,7 +15,7 @@ import requests
 # ---
 TARGET_CITIES = [
     # Primary: Berlin / Potsdam
-    "berlin", "potsdam", "teltow", "ludwigsfelde", "grünheide", "gruenheide",
+    "berlin","regensburg", "potsdam", "teltow", "ludwigsfelde", "grünheide", "gruenheide",
     # Secondary: Regensburg / Eastern Bavaria corridor
     "regensburg", "wackersdorf", "pfreimd", "straubing", "plattling",
     "neumarkt", "maxhütte", "burglengenfeld", "schwandorf", "zandt", "roding",
