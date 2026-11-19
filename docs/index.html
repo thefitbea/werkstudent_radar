@@ -11,68 +11,6 @@
       --green: #22c55e; --amber: #f59e0b; --red: #ef4444;
       --star: #facc15;
     }
-
-<button id="tabStarred">Starred (0)</button>
-
-   let starredIds = new Set(JSON.parse(localStorage.getItem("starredIds") || "[]"));
-
-function saveStarred() {
-  localStorage.setItem("starredIds", JSON.stringify([...starredIds]));
-}
-
-function sortByStarAndScore(list) {
-  list.sort((a, b) => {
-    const starDiff = Number(starredIds.has(b.id)) - Number(starredIds.has(a.id));
-    return starDiff !== 0 ? starDiff : b.score - a.score;
-  });
-}
-
-// Inside your #list click delegation handler:
-if (act === "star") {
-  starredIds.has(id) ? starredIds.delete(id) : starredIds.add(id);
-  saveStarred();
-  render();
-}
-
-
-
-
-
-    
-    
-    .job-card.starred {
-  border-color: rgba(250, 204, 21, 0.55);
-}
-
-.star-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  padding: 2px 6px;
-  font-size: 1.15rem;
-  line-height: 1;
-  color: #64748b;
-  cursor: pointer;
-}
-
-.star-btn:hover {
-  color: var(--star);
-  border-color: var(--border);
-}
-
-.star-btn.active {
-  color: var(--star);
-}
-
-
-
-
-
-
-
-
-
-
-    
     * { box-sizing: border-box; }
     body {
       margin: 0; font-family: system-ui, -apple-system, sans-serif;
@@ -101,7 +39,7 @@ if (act === "star") {
     }
     .chip.active { background: var(--accent); color: #0f172a; border-color: var(--accent); font-weight: 600; }
     .stats { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .tabs { display: flex; gap: 8px; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
     button {
       padding: 7px 12px; border-radius: 6px; border: 1px solid var(--border);
       background: var(--card); color: var(--text); cursor: pointer; font-size: 0.85rem;
@@ -111,20 +49,29 @@ if (act === "star") {
       background: var(--card); border: 1px solid var(--border); border-radius: 10px;
       padding: 14px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px;
     }
-    .job-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .job-card.starred { border-color: rgba(250, 204, 21, 0.6); }
+    .job-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .card-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .star-btn {
+      background: #0b1220; border: 1px solid var(--border); border-radius: 6px;
+      padding: 4px 8px; font-size: 1.05rem; line-height: 1; color: #64748b; cursor: pointer;
+    }
+    .star-btn:hover { border-color: var(--star); color: var(--star); }
+    .star-btn.active { color: var(--star); border-color: rgba(250, 204, 21, 0.55); }
     .job-title { font-weight: 700; font-size: 1rem; color: var(--accent); text-decoration: none; }
     .job-title:hover { text-decoration: underline; }
     .badge {
       display: inline-block; padding: 2px 8px; border-radius: 999px;
       font-size: 0.75rem; font-weight: 600; background: #0b1220; border: 1px solid var(--border);
     }
-    .score { background: rgba(34,197,94,0.18); color: var(--green); border-color: rgba(34,197,94,0.4); }
+    .score { background: rgba(34,197,94,0.18); color: var(--green); border-color: rgba(34,197,94,0.4); white-space: nowrap; }
     .warn { background: rgba(245,158,11,0.18); color: var(--amber); border-color: rgba(245,158,11,0.4); }
     .rej { background: rgba(239,68,68,0.18); color: var(--red); border-color: rgba(239,68,68,0.4); }
     .applied-tag { background: rgba(56,189,248,0.2); color: var(--accent); border-color: var(--accent); }
+    .starred-tag { background: rgba(250,204,21,0.16); color: var(--star); border-color: rgba(250,204,21,0.45); }
     .row-meta { font-size: 0.84rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     .snippet { font-size: 0.84rem; color: #cbd5e1; }
-    .actions { display: flex; gap: 8px; margin-top: 4px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
     .actions button { padding: 4px 10px; font-size: 0.78rem; }
   </style>
 </head>
@@ -182,6 +129,7 @@ if (act === "star") {
     <div class="stats">
       <div class="tabs">
         <button id="tabQualified" class="active">Qualified (0)</button>
+        <button id="tabStarred">Starred (0)</button>
         <button id="tabRejected">Filtered Out Audit (0)</button>
       </div>
       <div>
@@ -197,6 +145,7 @@ if (act === "star") {
     let allJobs = [];
     let activeTab = "qualified";
     let requiredSkills = new Set();
+    let starredIds = new Set(JSON.parse(localStorage.getItem("starredIds") || "[]"));
     let appliedIds = new Set(JSON.parse(localStorage.getItem("appliedIds") || "[]"));
     let hiddenIds = new Set(JSON.parse(localStorage.getItem("hiddenIds") || "[]"));
     let lastQualified = [];
@@ -215,6 +164,7 @@ if (act === "star") {
       hideDismissed: document.getElementById("hideDismissed"),
       chips: document.getElementById("skillChips"),
       tabQualified: document.getElementById("tabQualified"),
+      tabStarred: document.getElementById("tabStarred"),
       tabRejected: document.getElementById("tabRejected"),
       list: document.getElementById("list"),
       updatedAt: document.getElementById("updatedAt"),
@@ -234,6 +184,7 @@ if (act === "star") {
     });
 
     function saveState() {
+      localStorage.setItem("starredIds", JSON.stringify([...starredIds]));
       localStorage.setItem("appliedIds", JSON.stringify([...appliedIds]));
       localStorage.setItem("hiddenIds", JSON.stringify([...hiddenIds]));
     }
@@ -249,9 +200,11 @@ if (act === "star") {
       const minScore = Number(els.minScore.value);
       const extraEx = els.extraExclude.value.split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
 
-      const qualified = [], rejected = [];
+      const qualified = [], starred = [], rejected = [];
 
       for (const j of allJobs) {
+        if (starredIds.has(j.id)) starred.push(j);
+
         const hay = `${j.company} ${j.title} ${j.location} ${j.snippet} ${(j.skills || []).join(" ")}`.toLowerCase();
         let reason = "";
 
@@ -271,27 +224,33 @@ if (act === "star") {
         if (reason) rejected.push({ ...j, reason });
         else qualified.push(j);
       }
-      return { qualified, rejected };
+
+      qualified.sort((a, b) => (Number(starredIds.has(b.id)) - Number(starredIds.has(a.id))) || (b.score - a.score));
+      starred.sort((a, b) => b.score - a.score);
+      return { qualified, starred, rejected };
     }
 
     function render() {
       els.scoreVal.textContent = els.minScore.value;
-      const { qualified, rejected } = evaluate();
+      const { qualified, starred, rejected } = evaluate();
       lastQualified = qualified;
 
       els.tabQualified.textContent = `Qualified (${qualified.length})`;
+      els.tabStarred.textContent = `Starred (${starred.length})`;
       els.tabRejected.textContent = `Filtered Out Audit (${rejected.length})`;
 
-      const rows = activeTab === "qualified" ? qualified : rejected;
+      const rows = activeTab === "qualified" ? qualified : (activeTab === "starred" ? starred : rejected);
       if (!rows.length) {
         els.list.innerHTML = `<div class="panel">No jobs match the current filters. Try lowering Min Score or switching Region to All.</div>`;
         return;
       }
 
       els.list.innerHTML = rows.map(j => {
+        const isStarred = starredIds.has(j.id);
         const isApplied = appliedIds.has(j.id);
         const isHidden = hiddenIds.has(j.id);
         const flags = [];
+        if (isStarred) flags.push(`<span class="badge starred-tag">STARRED</span>`);
         if (j.is_pflicht) flags.push(`<span class="badge warn">Pflichtpraktikum</span>`);
         if (j.requires_car) flags.push(`<span class="badge warn">Car/License</span>`);
         if (j.requires_c1) flags.push(`<span class="badge rej">C1 German</span>`);
@@ -299,7 +258,7 @@ if (act === "star") {
         if (j.reason) flags.push(`<span class="badge rej">${escapeHtml(j.reason)}</span>`);
 
         return `
-          <article class="job-card">
+          <article class="job-card ${isStarred ? "starred" : ""}">
             <div class="job-top">
               <div>
                 <a class="job-title" href="${escapeHtml(j.url)}" target="_blank" rel="noopener">${escapeHtml(j.title)}</a>
@@ -310,7 +269,15 @@ if (act === "star") {
                   <span>• ${escapeHtml(j.source)}</span>
                 </div>
               </div>
-              <span class="badge score">Score ${j.score}</span>
+              <div class="card-right">
+                <span class="badge score">Score ${j.score}</span>
+                <button
+                  class="star-btn ${isStarred ? "active" : ""}"
+                  data-action="star"
+                  data-id="${escapeHtml(j.id)}"
+                  title="${isStarred ? "Unstar job" : "Star job"}"
+                >${isStarred ? "★" : "☆"}</button>
+              </div>
             </div>
             <div class="row-meta">
               ${(j.skills || []).map(s => `<span class="badge">${escapeHtml(s)}</span>`).join("")}
@@ -330,17 +297,30 @@ if (act === "star") {
       const btn = e.target.closest("button[data-action]");
       if (!btn) return;
       const id = btn.dataset.id;
-      if (btn.dataset.action === "apply") {
+      const act = btn.dataset.action;
+      if (!id || !act) return;
+      if (act === "star") {
+        starredIds.has(id) ? starredIds.delete(id) : starredIds.add(id);
+      } else if (act === "apply") {
         appliedIds.has(id) ? appliedIds.delete(id) : appliedIds.add(id);
-      } else if (btn.dataset.action === "hide") {
+      } else if (act === "hide") {
         hiddenIds.has(id) ? hiddenIds.delete(id) : hiddenIds.add(id);
       }
       saveState();
       render();
     });
 
-    els.tabQualified.onclick = () => { activeTab = "qualified"; els.tabQualified.classList.add("active"); els.tabRejected.classList.remove("active"); render(); };
-    els.tabRejected.onclick = () => { activeTab = "rejected"; els.tabRejected.classList.add("active"); els.tabQualified.classList.remove("active"); render(); };
+    function setActiveTab(tab) {
+      activeTab = tab;
+      els.tabQualified.classList.toggle("active", tab === "qualified");
+      els.tabStarred.classList.toggle("active", tab === "starred");
+      els.tabRejected.classList.toggle("active", tab === "rejected");
+      render();
+    }
+
+    els.tabQualified.onclick = () => setActiveTab("qualified");
+    els.tabStarred.onclick = () => setActiveTab("starred");
+    els.tabRejected.onclick = () => setActiveTab("rejected");
 
     els.exportCsv.onclick = () => {
       const headers = ["score", "company", "title", "contract", "location", "region", "skills", "source", "url"];
