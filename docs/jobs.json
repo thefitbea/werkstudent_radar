@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-23 18:39 UTC",
-  "total": 14,
+  "updated_at": "2026-11-24 18:08 UTC",
+  "total": 13,
   "jobs": [
     {
       "id": "sr:Gerresheimer:744000162049961",
@@ -290,26 +290,6 @@
       "requires_c1": false,
       "mentions_en": false,
       "requires_car": false,
-      "blacklist_hit": ""
-    },
-    {
-      "id": "sr:DreesSommerSE:744000161109889",
-      "company": "Drees & Sommer SE",
-      "title": "Werkstudent (w/m/d) Empfang & Office Management",
-      "location": "Berlin, de",
-      "region": "Berlin/Potsdam",
-      "contract": "Werkstudent",
-      "score": 1,
-      "skills": [
-        "prozess"
-      ],
-      "source": "SmartRecruiters",
-      "url": "https://jobs.smartrecruiters.com/DreesSommerSE/744000161109889",
-      "snippet": "Wir stehen jeden Morgen dafür auf, eine lebenswerte Zukunft für nachfolgende Generationen zu schaffen. Je nach Projekt sind wir Berater, Umsetzer – oder beides – nachhaltiger, innovativer und wirtschaftlicher Lösungen für Immobilien, Industrie, Energie und Inf",
-      "is_pflicht": false,
-      "requires_c1": false,
-      "mentions_en": false,
-      "requires_car": true,
       "blacklist_hit": ""
     }
   ]
