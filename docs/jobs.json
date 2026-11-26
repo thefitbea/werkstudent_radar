@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-25 17:31 UTC",
-  "total": 13,
+  "updated_at": "2026-11-26 17:14 UTC",
+  "total": 14,
   "jobs": [
     {
       "id": "sr:Gerresheimer:744000162049961",
@@ -48,6 +48,31 @@
       "is_pflicht": true,
       "requires_c1": false,
       "mentions_en": false,
+      "requires_car": false,
+      "blacklist_hit": ""
+    },
+    {
+      "id": "sr:Gerresheimer:744000163884454",
+      "company": "Gerresheimer",
+      "title": "Praktikum - Small Batch Production (Injection Molding / Assembly / Glass)",
+      "location": "Wackersdorf, de",
+      "region": "Bavaria",
+      "contract": "Praktikum / Intern",
+      "score": 10,
+      "skills": [
+        "erp",
+        "mes",
+        "daten",
+        "automatisierung",
+        "prozess",
+        "englisch"
+      ],
+      "source": "SmartRecruiters",
+      "url": "https://jobs.smartrecruiters.com/Gerresheimer/744000163884454",
+      "snippet": "Gerresheimer ist als innovativer System- und Lösungsanbieter der globale Partner der Pharma-, Biotech- und Kosmetikindustrie. Das Unternehmen bietet ein umfassendes Portfolio an pharmazeutischen Primärverpackungen, Verabreichungssystemen für Medikamente und di",
+      "is_pflicht": true,
+      "requires_c1": false,
+      "mentions_en": true,
       "requires_car": false,
       "blacklist_hit": ""
     },
